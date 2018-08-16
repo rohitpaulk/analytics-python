@@ -25,7 +25,8 @@ class Client(object):
     log = logging.getLogger('segment')
 
     def __init__(self, write_key=None, host=None, debug=False, max_queue_size=10000,
-                 send=True, on_error=None, upload_interval=0.5, gzip=False, max_retries=10):
+                 send=True, on_error=None, upload_size=100, upload_interval=0.5,
+                 gzip=False, max_retries=10, sync_mode=False):
         require('write_key', write_key, string_types)
 
         self.max_queue_size = max_queue_size
@@ -37,6 +38,7 @@ class Client(object):
         self.on_error = on_error
         self.debug = debug
         self.send = send
+        self.sync_mode = sync_mode
 
         if debug:
             self.log.setLevel(logging.DEBUG)
@@ -228,9 +230,11 @@ class Client(object):
         if not self.send:
             return True, msg
 
-        if self.max_queue_size == 1:  # If queue size is 1, enqueue with blocking call (synchronously)
-            self.queue.put(msg, block=True)
+        if self.sync_mode:
             self.log.debug('enqueued with blocking %s.', msg['type'])
+            self.queue.put(msg, block=True)
+            self.flush()
+
             return True, msg
 
         try:
