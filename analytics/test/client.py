@@ -256,8 +256,6 @@ class TestClient(unittest.TestCase):
 
     def test_synchronous(self):
         client = Client('testsecret', sync_mode=True)
-        # Ensure the consumer thread is not running
-        client.consumer.pause()
 
         success, message = client.identify('userId')
         self.assertTrue(client.queue.empty())
