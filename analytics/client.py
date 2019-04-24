@@ -29,8 +29,6 @@ class Client(object):
                  gzip=False, max_retries=10, sync_mode=False):
         require('write_key', write_key, string_types)
 
-        self.max_queue_size = max_queue_size
-        self.host = host
         self.queue = queue.Queue(max_queue_size)
         self.consumer = Consumer(self.queue, write_key, host=host, on_error=on_error,
                                  upload_interval=upload_interval, gzip=gzip, retries=max_retries)
